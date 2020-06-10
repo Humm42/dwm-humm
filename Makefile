@@ -8,6 +8,12 @@ OBJ = ${SRC:.c=.o}
 
 all: options dwm
 
+patch:
+	for patch in patches/*.diff; \
+	do \
+		patch -p1 <"$$patch"; \
+	done
+
 options:
 	@echo dwm build options:
 	@echo "CFLAGS   = ${CFLAGS}"
@@ -48,4 +54,4 @@ uninstall:
 	rm -f ${DESTDIR}${PREFIX}/bin/dwm\
 		${DESTDIR}${MANPREFIX}/man1/dwm.1
 
-.PHONY: all options clean dist install uninstall
+.PHONY: all patch options clean dist install uninstall
