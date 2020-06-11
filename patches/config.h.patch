@@ -9,13 +9,15 @@
  static const unsigned int snap      = 32;       /* snap pixel */
  static const unsigned int gappih    = 10;       /* horiz inner gap between windows */
  static const unsigned int gappiv    = 10;       /* vert inner gap between windows */
-@@ -17,11 +17,22 @@
- static const char col_gray3[]       = "#bbbbbb";
- static const char col_gray4[]       = "#eeeeee";
- static const char col_cyan[]        = "#005577";
+@@ -12,6 +12,7 @@
+ static const int topbar             = 1;        /* 0 means bottom bar */
+ static const char *fonts[]          = { "monospace:size=10" };
+ static const char dmenufont[]       = "monospace:size=10";
 +#if 0
- static const char *colors[][3]      = {
- 	/*               fg         bg         border   */
+ static const char col_gray1[]       = "#222222";
+ static const char col_gray2[]       = "#444444";
+ static const char col_gray3[]       = "#bbbbbb";
+@@ -22,6 +23,18 @@
  	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
  	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
  };
@@ -24,6 +26,8 @@
 +static const char col_border_inact[] = "#9eeeee";
 +static const char col_black[] = "#000000";
 +static const char col_white[] = "#ffffff";
++static const char col_acme_blue_light[] = "#8888cc";
++static const char col_acme_blue_dark[] = "#000099";
 +static const char *colors[][3] = {
 +	[SchemeNorm] = { col_black, col_border_inact, col_border_inact },
 +	[SchemeSel] = { col_black, col_border_act, col_border_act },
@@ -32,7 +36,7 @@
  
  /* tagging */
  static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
-@@ -49,7 +60,7 @@
+@@ -49,7 +62,7 @@
  };
  
  /* key definitions */
@@ -41,12 +45,65 @@
  #define TAGKEYS(KEY,TAG) \
  	{ MODKEY,                       KEY,      view,           {.ui = 1 << TAG} }, \
  	{ MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
-@@ -62,7 +73,7 @@
+@@ -61,13 +74,13 @@
+ 
  /* commands */
  static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
- static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
+-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
 -static const char *termcmd[]  = { "st", NULL };
++static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_border_inact, "-nf", col_black, "-sb", col_acme_blue_dark, "-sf", col_white, NULL };
 +static const char *termcmd[]  = { "sh", "-c", "${TERMINAL:-xterm}", NULL };
  
  static Key keys[] = {
  	/* modifier                     key        function        argument */
+-	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
+-	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
++	{ MODKEY,                       XK_r,      spawn,          {.v = dmenucmd } },
++	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
+ 	{ MODKEY,                       XK_b,      togglebar,      {0} },
+ 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
+ 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
+@@ -75,29 +88,14 @@
+ 	{ MODKEY,                       XK_d,      incnmaster,     {.i = -1 } },
+ 	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
+ 	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
+-	{ MODKEY|Mod4Mask,              XK_h,      incrgaps,       {.i = +1 } },
+-	{ MODKEY|Mod4Mask,              XK_l,      incrgaps,       {.i = -1 } },
+-	{ MODKEY|Mod4Mask|ShiftMask,    XK_h,      incrogaps,      {.i = +1 } },
+-	{ MODKEY|Mod4Mask|ShiftMask,    XK_l,      incrogaps,      {.i = -1 } },
+-	{ MODKEY|Mod4Mask|ControlMask,  XK_h,      incrigaps,      {.i = +1 } },
+-	{ MODKEY|Mod4Mask|ControlMask,  XK_l,      incrigaps,      {.i = -1 } },
+-	{ MODKEY|Mod4Mask,              XK_0,      togglegaps,     {0} },
+-	{ MODKEY|Mod4Mask|ShiftMask,    XK_0,      defaultgaps,    {0} },
+-	{ MODKEY,                       XK_y,      incrihgaps,     {.i = +1 } },
+-	{ MODKEY,                       XK_o,      incrihgaps,     {.i = -1 } },
+-	{ MODKEY|ControlMask,           XK_y,      incrivgaps,     {.i = +1 } },
+-	{ MODKEY|ControlMask,           XK_o,      incrivgaps,     {.i = -1 } },
+-	{ MODKEY|Mod4Mask,              XK_y,      incrohgaps,     {.i = +1 } },
+-	{ MODKEY|Mod4Mask,              XK_o,      incrohgaps,     {.i = -1 } },
+-	{ MODKEY|ShiftMask,             XK_y,      incrovgaps,     {.i = +1 } },
+-	{ MODKEY|ShiftMask,             XK_o,      incrovgaps,     {.i = -1 } },
+-	{ MODKEY,                       XK_Return, zoom,           {0} },
+-	{ MODKEY,                       XK_Tab,    view,           {0} },
+-	{ MODKEY|ShiftMask,             XK_c,      killclient,     {0} },
++	{ MODKEY|ShiftMask,             XK_j,      incrgaps,       {.i = -1 } },
++	{ MODKEY|ShiftMask,             XK_k,      incrgaps,       {.i = +1 } },
++	{ MODKEY,                       XK_equal,  defaultgaps,    {0} },
++	{ MODKEY|ShiftMask,             XK_Return, zoom,           {0} },
++	{ MODKEY,                       XK_q,      killclient,     {0} },
+ 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
+ 	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} },
+ 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
+-	{ MODKEY,                       XK_space,  setlayout,      {0} },
+ 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
+ 	{ MODKEY,                       XK_s,      togglesticky,   {0} },
+ 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
+@@ -115,7 +113,7 @@
+ 	TAGKEYS(                        XK_7,                      6)
+ 	TAGKEYS(                        XK_8,                      7)
+ 	TAGKEYS(                        XK_9,                      8)
+-	{ MODKEY|ShiftMask,             XK_q,      quit,           {0} },
++	{ MODKEY|ShiftMask,             XK_e,      quit,           {0} },
+ };
+ 
+ /* button definitions */
