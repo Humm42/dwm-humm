@@ -14,7 +14,7 @@ patch:
 		patch -p1 <"$$patch"; \
 	done
 	cp config.def.h config.h
-	patch <patches/config.h.patch
+	patch -p1 <patches/config.h.patch
 
 options:
 	@echo dwm build options:
